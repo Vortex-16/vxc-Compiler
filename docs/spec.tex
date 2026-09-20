@@ -1,0 +1,50 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{hyperref}
+\title{Vortex Compiler (VXC)\\Language Specification and Phase 1 Lexer}
+\author{Vikash Kumar Gupta}
+\date{\today}
+\definecolor{codegray}{gray}{0.95}
+\lstset{basicstyle=\ttfamily\small,backgroundcolor=\color{codegray},frame=single,breaklines=true}
+\begin{document}
+\maketitle
+\section{Purpose}
+Vortex Compiler (VXC) is an educational compiler implemented in C. Its initial target is a custom stack-based virtual machine. Phase 1 defines the language and implements lexical analysis.
+\section{Compilation Pipeline}
+\begin{center}
+\begin{tikzpicture}[node distance=8mm, every node/.style={draw,rounded corners,align=center,minimum width=4cm,minimum height=8mm}]
+\node (s) {Source Code}; \node (l) [below=of s] {Lexer}; \node (p) [below=of l] {Parser / AST};\node (sem) [below=of p] {Semantic Analysis};\node (ir) [below=of sem] {Intermediate Representation};\node (opt) [below=of ir] {Optimization};\node (vm) [below=of opt] {Virtual Machine};
+\foreach \a/\b in {s/l,l/p,p/sem,sem/ir,ir/opt,opt/vm} {\draw[->] (\a)--(\b);}
+\end{tikzpicture}
+\end{center}
+\section{Lexical Specification}
+The lexer recognizes whitespace, line comments beginning with \texttt{//}, identifiers, decimal integer literals, keywords, and punctuation.
+\subsection{Keywords}
+\texttt{fn}, \texttt{let}, \texttt{int}, and \texttt{print} are reserved keywords.
+\subsection{Token Grammar}
+\begin{lstlisting}
+identifier   := letter (letter | digit | '_')*
+integer      := digit+
+letter       := 'A'..'Z' | 'a'..'z' | '_'
+digit        := '0'..'9'
+\end{lstlisting}
+\section{Example Program}
+\begin{lstlisting}
+fn main() {
+    let x: int = 10 + 20;
+    print(x);
+}
+\end{lstlisting}
+\section{Phase 1 Implementation}
+The current C implementation reads a source file and prints each token with its type, lexeme, line, and column. This provides a testable foundation for the parser.
+\section{Build and Run}
+\begin{lstlisting}
+make
+./build/vxc examples/hello.vxc
+\end{lstlisting}
+\section{Next Phase}
+Phase 2 will add a recursive-descent parser and an abstract syntax tree for declarations, expressions, and function bodies.
+\end{document}
