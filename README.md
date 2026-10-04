@@ -1,24 +1,64 @@
 # Vortex Compiler (VXC)
-Phase 1: language specification and a working lexer prototype.
+Vortex Compiler (VXC) is an educational C compiler targeting a custom stack-based virtual machine.
 
-## Build
+## Prerequisites & Requirements
+
+VXC requires a C11-compliant compiler (`cc`, `gcc`, or `clang`) and `make`.
+
+### Linux (Ubuntu/Debian)
 ```bash
+sudo apt update
+sudo apt install build-essential
+```
+
+### Linux (Fedora/RHEL)
+```bash
+sudo dnf groupinstall "Development Tools"
+```
+
+### macOS
+Install the Xcode Command Line Tools:
+```bash
+xcode-select --install
+```
+
+### Windows
+You can build using **Git Bash** with **LLVM-MinGW** or **MSYS2**:
+1. Install LLVM-MinGW via winget:
+   ```cmd
+   winget install MartinStorsjo.LLVM-MinGW.UCRT
+   ```
+2. In Git Bash, verify `clang` and `make` are available:
+   ```bash
+   clang --version
+   make --version
+   ```
+
+## Build & Run
+
+```bash
+# Build the compiler
 make
+
+# Run the parser on an example program (prints AST by default)
 ./build/vxc examples/hello.vxc
+
+# Or on Windows Git Bash / Command Prompt:
+./build/vxc.exe examples/hello.vxc
+
+# Inspect raw token stream
+./build/vxc examples/hello.vxc --dump-tokens
 ```
 
 ## Current scope
-- identifiers and keywords: `fn`, `let`, `int`, `print`
-- integer literals
-- operators: `+ - * / = : ; ( ) { }`
-- whitespace and `//` comments
-- line/column diagnostics
-
-The parser, semantic analyzer, IR, optimizer, and VM will be added in later phases.
+- Lexer: identifiers, keywords (`fn`, `let`, `int`, `print`), literals, operators, comments
+- Recursive-descent Parser: functions, statements (`let`, `print`, expr), binary expressions with precedence
+- AST Pretty Printer (`--dump-ast`)
+- Line/column diagnostics & panic-mode error recovery
 
 ## Roadmap & Architecture Phases
 - [x] **Phase 1: Lexer & Specification** (Tokenization, CLI, LaTeX spec)
-- [ ] **Phase 2: Parser & AST** (Recursive descent parser, AST node definitions, AST printer)
+- [x] **Phase 2: Parser & AST** (Recursive descent parser, AST node definitions, AST printer)
 - [ ] **Phase 3: Semantic Analysis & Type Checker** (Symbol table, scope checking, type inference/checking)
 - [ ] **Phase 4: Intermediate Representation (IR) & Bytecode** (Linear 3-address code or stack bytecode generation)
 - [ ] **Phase 5: Virtual Machine / Runtime** (Stack-based execution engine, standard library built-ins)
