@@ -48,18 +48,26 @@ make
 
 # Inspect raw token stream
 ./build/vxc examples/hello.vxc --dump-tokens
+
+# Run semantic analysis and type checking
+./build/vxc examples/hello.vxc --check
+
+# Run test suite
+make test
 ```
 
 ## Current scope
 - Lexer: identifiers, keywords (`fn`, `let`, `int`, `print`), literals, operators, comments
 - Recursive-descent Parser: functions, statements (`let`, `print`, expr), binary expressions with precedence
 - AST Pretty Printer (`--dump-ast`)
+- Semantic Analysis & Type Checker: scoped symbol table, variable declaration/redeclaration rules, type compatibility, and `main` entry validation (`--check`)
 - Line/column diagnostics & panic-mode error recovery
+- Automated regression test suite (`make test`)
 
 ## Roadmap & Architecture Phases
 - [x] **Phase 1: Lexer & Specification** (Tokenization, CLI, LaTeX spec)
 - [x] **Phase 2: Parser & AST** (Recursive descent parser, AST node definitions, AST printer)
-- [ ] **Phase 3: Semantic Analysis & Type Checker** (Symbol table, scope checking, type inference/checking)
+- [x] **Phase 3: Semantic Analysis & Type Checker** (Symbol table, scope checking, type inference/checking)
 - [ ] **Phase 4: Intermediate Representation (IR) & Bytecode** (Linear 3-address code or stack bytecode generation)
 - [ ] **Phase 5: Virtual Machine / Runtime** (Stack-based execution engine, standard library built-ins)
 - [ ] **Phase 6: Basic Optimizations** (Constant folding, dead code elimination)

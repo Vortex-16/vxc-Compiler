@@ -1,0 +1,4 @@
+fn helper() {
+    let x: int = 10;
+    print(x);
+}

@@ -1,0 +1,6 @@
+fn main() {
+    let a: int = 10;
+    let b: int = 20;
+    let c: int = (a + b) * 3;
+    print(c);
+}

@@ -4,6 +4,7 @@
 #include "token.h"
 #include "ast.h"
 #include "parser.h"
+#include "sema.h"
 
 void lexer_init(const char *text);
 Token next_token(void);
@@ -12,7 +13,8 @@ static void print_usage(const char *prog_name) {
     fprintf(stderr, "Usage: %s [options] <source.vxc>\n", prog_name);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "  --dump-tokens    Print token stream from lexer\n");
-    fprintf(stderr, "  --dump-ast       Print AST after parsing (default)\n");
+    fprintf(stderr, "  --dump-ast       Print AST after parsing\n");
+    fprintf(stderr, "  --check          Run semantic analysis and type checking\n");
 }
 
 int main(int argc, char **argv) {
@@ -23,14 +25,20 @@ int main(int argc, char **argv) {
 
     const char *filepath = NULL;
     int dump_tokens = 0;
-    int dump_ast = 1;
+    int dump_ast = 0;
+    int check_only = 0;
+    int mode_specified = 0;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--dump-tokens") == 0) {
             dump_tokens = 1;
-            dump_ast = 0;
+            mode_specified = 1;
         } else if (strcmp(argv[i], "--dump-ast") == 0) {
             dump_ast = 1;
+            mode_specified = 1;
+        } else if (strcmp(argv[i], "--check") == 0) {
+            check_only = 1;
+            mode_specified = 1;
         } else if (argv[i][0] == '-') {
             fprintf(stderr, "Unknown option: %s\n", argv[i]);
             print_usage(argv[0]);
@@ -38,6 +46,10 @@ int main(int argc, char **argv) {
         } else {
             filepath = argv[i];
         }
+    }
+
+    if (!mode_specified) {
+        dump_ast = 1;
     }
 
     if (!filepath) {
@@ -92,8 +104,23 @@ int main(int argc, char **argv) {
     if (parser.had_error) {
         fprintf(stderr, "Parsing failed with errors.\n");
         exit_code = 1;
-    } else if (dump_ast) {
-        ast_print_program(prog);
+    } else {
+        Sema sema;
+        sema_init(&sema);
+        int sema_errors = sema_analyze_program(&sema, prog);
+        sema_free(&sema);
+
+        if (sema_errors > 0) {
+            fprintf(stderr, "Semantic analysis failed with %d error(s).\n", sema_errors);
+            exit_code = 1;
+        } else {
+            if (check_only) {
+                printf("Semantic analysis passed.\n");
+            }
+            if (dump_ast) {
+                ast_print_program(prog);
+            }
+        }
     }
 
     ast_free_program(prog);
